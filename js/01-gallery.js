@@ -1,24 +1,42 @@
 import { galleryItems } from "./gallery-items.js";
 // Change code below this line
 
-// console.log(galleryItems);
+const navGallery = document.querySelector(".gallery");
+const itemsMarkup = createGalleryItem(galleryItems);
 
-galleryItems.forEach((item) => {
-	const navGallery = document.querySelector(".gallery");
-	// console.log(navGallery);
-	const createGalleryItem = document.createElement("div");
-	createGalleryItem.classList.add("gallery__item");
+navGallery.insertAdjacentHTML("beforeend", itemsMarkup);
 
-	const createGalleryLink = document.createElement("a");
-	createGalleryLink.classList.add("gallery__link");
+function createGalleryItem(galleryItems) {
+	return galleryItems
+		.map(({ preview, original, description }) => {
+			return `
+			<div class="gallery__item">
+			<a class="gallery__link" href="${original}">
+			<img
+				class="gallery__image"
+				src="${preview}"
+				data-source="${original}"
+				alt="${description}"
+				/>
+				</a>
+				</div>
+	`;
+		})
+		.join("");
+}
 
-	const createGalleryImage = document.createElement("img");
-	createGalleryImage.classList.add("gallery__image");
-	createGalleryImage.setAttribute("src", item.preview);
-	createGalleryImage.setAttribute("data-source", item.original);
-	createGalleryImage.setAttribute("alt", item.description);
+navGallery.addEventListener("click", onImageClick);
 
-	createGalleryLink.append(createGalleryImage);
-	createGalleryItem.append(createGalleryLink);
-	navGallery.append(createGalleryItem);
-});
+function onImageClick(evt) {
+	evt.preventDefault();
+	if (evt.target.nodeName !== "IMG") {
+		return;
+	}
+	const originalImage = evt.target.getAttribute("data-source");
+
+	const instance = basicLightbox.create(`
+    <img src="${originalImage}" width="800" height="600">
+`);
+
+	instance.show();
+}
